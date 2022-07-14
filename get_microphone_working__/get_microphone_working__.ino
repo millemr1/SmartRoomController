@@ -6,11 +6,15 @@
 
 
 #include <Adafruit_NeoPixel.h>
-int sensorValue;
+#include <colors.h>
+
+///int sensorValue;
 int PIXELCOUNT = 1;
 int PIXELPIN = 9; 
 //int i; 
 int loudnessToBrightness;
+int average;
+
 
 Adafruit_NeoPixel pixel(PIXELCOUNT, PIXELPIN,  NEO_GRB + NEO_KHZ800);
 
@@ -23,11 +27,34 @@ void setup() {
 }
 
 void loop() {
-  sensorValue = analogRead(A9);
-  Serial.printf("Sensor Value: %i\n" , sensorValue);
-  //delay(500);
-  loudnessToBrightness = map(sensorValue, 0, 255, 0, 1025);
+ 
+  ///Serial.printf("Sensor Value: %i\n" , );
+  averageMicrophoneReadings();
+  loudnessToBrightness = map(average, 0, 1024,0,64);
   pixel.setBrightness(loudnessToBrightness);
+  pixel.setPixelColor(0, blue);
   pixel.show();
-  
 }
+
+int averageMicrophoneReadings(){
+  int summation = 0;
+  int min = 0;
+  int max = 0;
+  int i;
+  int  microValue;
+
+ for(i = 0; i < 100; i++){  // averages the reading from the microphone every 100 times to help level off backround noise 
+  microValue = analogRead(A9);
+  summation = microValue + summation; // adds the updated values at the top of every loop to summation
+  if(min > microValue) {  //updates minimum and maximum values 
+    min = microValue;
+    }
+   if (max < microValue){
+    max = microValue;    
+   }
+    }
+    average = (summation/1000);
+    return average;
+}
+  
+  
