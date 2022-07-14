@@ -1,5 +1,5 @@
-/* Project: NeoPixel
- * Descpition: lightup NeoPixels
+/* Project: NeoPixel and sound
+ * Descpition: lightup NeoPixels with sound
  * Author:  Micalah Miller
  * July-14-2022
 */
@@ -23,7 +23,7 @@ void setup() {
   pixel.begin();
   pixel.show();
   Serial.begin(9600);
-  //pinMode(A9, INPUT);
+  pinMode(A9, INPUT);
 
 }
 
@@ -31,7 +31,7 @@ void loop() {
  
   averagedReadings = averageMicrophoneReadings();
   Serial.printf("Sensor Value Average: %i \n" , averagedReadings );
-  loudnessToBrightness = map(averagedReadings, 0, 800,0,64);
+  loudnessToBrightness = map(averagedReadings, 400, 650,0,128);
   Serial.printf("Mapped Value: %i \n", loudnessToBrightness);
   pixel.setBrightness(loudnessToBrightness);
   pixel.setPixelColor(0, blue);
@@ -41,11 +41,10 @@ void loop() {
 int averageMicrophoneReadings(){
   int average;
   int summation = 0;
-  int min = 0;
-  int max = 0;
+  int min = 1023;  //start min high and bring it down
+  int max = 0;  //start max low and bring it up
   int i;
   int  microValue;
-
 
   for(i = 0; i < 100; i++){  // averages the reading from the microphone every 100 times to help level off backround noise 
     microValue = analogRead(A9);
@@ -60,7 +59,7 @@ int averageMicrophoneReadings(){
     
   Serial.printf("Min: %i \n, Max: %i \n", min, max);
     average = (summation/100);
-    return  averages;  
+    return  average;  
 }
   
   
