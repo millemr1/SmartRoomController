@@ -11,7 +11,6 @@ int PIXELCOUNT = 1;
 int PIXELPIN = 9;  
 int i;
 
-
 Adafruit_NeoPixel pixel(PIXELCOUNT, PIXELPIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
@@ -25,10 +24,11 @@ void setup() {
 
 void loop() {
  int seconds = second(); 
- pixel.setBrightness(0, 0+1);
+ pixel.setBrightness(seconds);
  pixel.show();
  int minutes = minute();
- pixel.setPixelColor(0, rainbow[i%7]);
+ pixel.setPixelColor(0, rainbow[minutes%7]);
+ pixel.show();
  Serial.printf("minute: %i \n second: %i \n" , minutes, seconds);
 
 }
