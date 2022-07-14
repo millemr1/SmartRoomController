@@ -31,7 +31,7 @@ void loop() {
  
   averagedReadings = averageMicrophoneReadings();
   Serial.printf("Sensor Value Average: %i \n" , averagedReadings );
-  loudnessToBrightness = map(averagedReadings, 0, 1024,0,64);
+  loudnessToBrightness = map(averagedReadings, 0, 800,0,64);
   Serial.printf("Mapped Value: %i \n", loudnessToBrightness);
   pixel.setBrightness(loudnessToBrightness);
   pixel.setPixelColor(0, blue);
@@ -57,9 +57,10 @@ int averageMicrophoneReadings(){
        max = microValue;    
    }
     }
-    average = (summation/100);
-    return  average;
     
+  Serial.printf("Min: %i \n, Max: %i \n", min, max);
+    average = (summation/100);
+    return  averages;  
 }
   
   
