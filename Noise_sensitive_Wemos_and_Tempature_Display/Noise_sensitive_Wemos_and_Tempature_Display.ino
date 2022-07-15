@@ -34,11 +34,12 @@ void setup() {
 void loop() {
   averagedReadings = averageMicrophoneReadings();
   if (averagedReadings > 800) {    //turn the lights in the room on if sound has been heard
-    turnLightsOnAndOff();
+    turnLightsOn();
     lastSound =  millis();
     }                          
-  if (lastSound - millis() > 3000){
-    turnLightsOnAndOff();
+  if (millis()-lastSound > 3000){
+    turnLightsOff();
+    lastSound = millis();
     }
     
 }
@@ -66,21 +67,19 @@ int averageMicrophoneReadings(){
     average = (summation/100);
     return  average;  
 }
-void turnLightsOnAndOff(){  //get all smart lights in room to turn on I think
+void turnLightsOn(){  //get all smart lights in room to turn on I think
  int lightNumber;
- bool onOff;
- onOff = !onOff;
-  if(onOff == true){
-    for (lightNumber = 1; lightNumber < 6; lightNumber++){
+    for (lightNumber = 1; lightNumber < 7; lightNumber++){
     setHue(lightNumber, true, HueRainbow[lightNumber%7], 80, 255);
-    }
-    }
-    if(onOff == false){
-      for(lightNumber = 1; lightNumber < 6; lightNumber++){
+    }      
+}
+void turnLightsOff(){
+  int lightNumber;
+      for(lightNumber = 1; lightNumber < 7; lightNumber++){
         setHue(lightNumber, false, HueRainbow[lightNumber%7], 0, 0);
         }
       }
-}
+
 void printIP() {
   Serial.printf("My IP address: ");
   for (byte thisByte = 0; thisByte < 3; thisByte++) {
