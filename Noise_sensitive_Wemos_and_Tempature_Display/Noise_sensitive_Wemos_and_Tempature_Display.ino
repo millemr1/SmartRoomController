@@ -33,7 +33,7 @@ void setup() {
 
 void loop() {
   averagedReadings = averageMicrophoneReadings();
-  if (averagedReadings > 800) {    //turn the lights in the room on if sound has been heard
+  if (averagedReadings > 550) {    //turn the lights in the room on if sound has been heard
     turnLightsOn();
     lastSound =  millis();
     }                          
@@ -70,13 +70,13 @@ int averageMicrophoneReadings(){
 void turnLightsOn(){  //get all smart lights in room to turn on I think
  int lightNumber;
     for (lightNumber = 1; lightNumber < 7; lightNumber++){
-    setHue(lightNumber, true, HueRainbow[lightNumber%7], 80, 255);
+    setHue(lightNumber, true, HueRainbow[(lightNumber%7)-1], 150, 255);  //get to start 
     }      
 }
 void turnLightsOff(){
   int lightNumber;
       for(lightNumber = 1; lightNumber < 7; lightNumber++){
-        setHue(lightNumber, false, HueRainbow[lightNumber%7], 0, 0);
+        setHue(lightNumber, false, HueRainbow[(lightNumber%7)-1], 0, 0);
         }
       }
 
