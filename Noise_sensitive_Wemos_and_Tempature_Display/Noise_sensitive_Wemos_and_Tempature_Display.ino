@@ -14,6 +14,7 @@
 
  byte thisByte;   //for ethernet IP address
  int averagedReadings;
+ int lastSound;
 
 void setup() {
 
@@ -21,8 +22,10 @@ void setup() {
   pinMode(A9, INPUT);  // pin for reading
   pinMode(10, OUTPUT);  // chip select for ehternet
   digitalWrite(10,HIGH); //
-
   Ethernet.begin(mac);
+  delay(200);
+  printIP();   
+  Serial.printf("LinkStatus: %i \n", Ethernet.linkStatus());  // making sure we have a connection and IP address for the network in the room
   
  // pinMode(4, OUTPUT);
 //  digitalWrite(4, HIGH);
@@ -35,7 +38,7 @@ void loop() {
     lastSound =  millis();
     }                          
   if (lastSound - millis() > 3000){
-    turnLightsOffAndOff();
+    turnLightsOnAndOff();
     }
     
 }
@@ -63,18 +66,25 @@ int averageMicrophoneReadings(){
     average = (summation/100);
     return  average;  
 }
-void turnLightsOnandOff(){  //get all smart lights in room to turn on I think
+void turnLightsOnAndOff(){  //get all smart lights in room to turn on I think
  int lightNumber;
- bool onOFF;
+ bool onOff;
  onOff = !onOff;
   if(onOff == true){
     for (lightNumber = 1; lightNumber < 6; lightNumber++){
-    setHue(lightNumber, true, rainbow[lightNumber%7], 80, 255);
+    setHue(lightNumber, true, HueRainbow[lightNumber%7], 80, 255);
     }
     }
     if(onOff == false){
       for(lightNumber = 1; lightNumber < 6; lightNumber++){
-        setHue(lightNumber, false, rainbowNumber%7, 0, 0);
+        setHue(lightNumber, false, HueRainbow[lightNumber%7], 0, 0);
         }
       }
+}
+void printIP() {
+  Serial.printf("My IP address: ");
+  for (byte thisByte = 0; thisByte < 3; thisByte++) {
+  Serial.printf("%i.",Ethernet.localIP()[thisByte]);
+ }
+ Serial.printf("%i\n",Ethernet.localIP()[3]);
 }
