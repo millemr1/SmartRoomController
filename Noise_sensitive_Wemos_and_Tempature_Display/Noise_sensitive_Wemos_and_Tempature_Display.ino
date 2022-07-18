@@ -9,6 +9,7 @@
 #include <mac.h>
 #include <Adafruit_SSD1306.h>
 #include<Adafruit_GFX.h>
+#include <Adafruit_BME280.h>
 #include<Wire.h>
 
 
@@ -17,10 +18,10 @@
  int lastSound;
 
 
-const int screeenWidth = 128;
-const int; screenHeight = 64;
+const int screenWidth = 128;
+const int screenHeight = 64;
 const int screenAddress= 0x3C;  //Screen Address (I think)
-const sensorAddress = 0x76; //temp, press, and sensor adress on breadboard
+const int sensorAddress = 0x76; //temp, press, and sensor adress on breadboard
 const int  OLEDReset = -1;
  
 Adafruit_BME280 bme;   //declare objects
@@ -54,7 +55,7 @@ void loop() {
     lastSound =  millis();
     }                          
   if (millis()-lastSound > 300000){
-    display.clearDisplay(); //turn off the display when not heard
+    display.clearDisplay(); //turn off the display when sound is not heard
     turnLightsOff();
     lastSound = millis();
     }
@@ -101,14 +102,15 @@ void takeReadings(){     // take and convert temperature and pressure readings a
   float pressPA;
   float humidRH;
   float roomTempF;
+  float pressureHG;
 
  tempC= bme.readTemperature();
  pressPA = bme.readPressure();
  humidRH = bme.readHumidity();
  humidRH = bme.readHumidity(); 
- roomTempF = (tempC*1.8)+32  // convert to Celcius to Farenheit degrees
- pressHG =  (pressPA)*(1/3386.39); //convert from Pascals to units of mercury
- display.printf(" Welcome, Micalah! \n Temp: %0.2f%c \n Pressure: %0.2f \n Humidity: %0.2f \n" ,roomtempF,0xF8, pressureHG,humidRH);
+ roomTempF = (tempC*1.8)+32;  // convert to Celcius to Farenheit degrees
+ pressureHG =  (pressPA)*(1/3386.39); //convert from Pascals to units of mercury
+ display.printf(" Welcome, Micalah! \n Temp: %0.2f%c \n Pressure: %0.2f \n Humidity: %0.2f \n" ,roomTempF, pressureHG,humidRH);
  display.display();
 }
 
