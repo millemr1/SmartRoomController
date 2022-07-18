@@ -16,12 +16,12 @@ bool status;
 byte thisbyte;  //for ip address
 
 void setup() {
-  inMode(10, OUTPUT);  // enables serial monitor pin
-  digitalWrite(10, HIGH);
-
+  
   Serial.begin(9600);
-
-   status = Ethernet.begin(mac);    //begin ethernet connection
+  
+  pinMode(10, OUTPUT);  // enables serial monitor pin
+  digitalWrite(10, HIGH);
+  status = Ethernet.begin(mac);    //begin ethernet connection
   if (!status) {
     Serial.printf("failed to configure Ethernet using DHCP \n");
     //no point in continueing 
@@ -37,11 +37,16 @@ void setup() {
 }
 
 void loop() {
-  if(DoTimesMatch())
-  switchON(3);
+  //currentTimeforWemos = millis();
+  currentTime = getCurrentTime();
+  specficTime = (15,37,00);
+  //getCurrentTime(currentTime);
+  timesMatched = DoTimesMatch(currentTime, specificTime);
+  if(timesMatched(currentTime, specificTime){   //Keep wemo on for a few minutes would be something like 
+     switchON(3);
   }
-  else();
-  switchOFF(3);
+ // else();
+ // switchOFF(3);
   }
 
 int getCurrentTime(){ //try to write to get it on at anytime I pass into the function
@@ -50,18 +55,17 @@ int getCurrentTime(){ //try to write to get it on at anytime I pass into the fun
   int hours = hour();
   int minutes = minute();
   int seconds = second();  //might be extraneous?
-  
   currentTime = hour + minute + second;
   Serial.printf("Time: %i : %i, %i", hours, minutes, seconds);  // have it display to screen eventually?
     return currentTime;
   }
 int setSpecificiedTime(int hours, int minutes, int seconds){  //I am quite unsure what I am doing here
-  specficTime = hours + minutes + seconds
+  int specficTime = hours + minutes + seconds
   return specficiedTime
 }
-bool DoTimesMatch(currentTime, specifiedTime){
+bool DoTimesMatch(int time1, int time2){
   bool timesMatch;
-  if (currentTime == specifiedTime){  //this is most certainly wrong
+  if (time1 == time2){  //this is most certainly wrong
     timesMatch = true;
   }
  else{
@@ -69,6 +73,22 @@ bool DoTimesMatch(currentTime, specifiedTime){
   }
  return timesMatch;
 }
+
+void printIP() {
+  Serial.printf("My IP address: ");
+  for (byte thisByte = 0; thisByte < 3; thisByte++) {
+  Serial.printf("%i.",Ethernet.localIP()[thisByte]);
+ }
+ Serial.printf("%i\n",Ethernet.localIP()[3]);
+}
+void printIP() {
+  Serial.printf("My IP address: ");
+  for (byte thisByte = 0; thisByte < 3; thisByte++) {
+  Serial.printf("%i.",Ethernet.localIP()[thisByte]);
+ }
+ Serial.printf("%i\n",Ethernet.localIP()[3]);
+}
+  
 
 
   

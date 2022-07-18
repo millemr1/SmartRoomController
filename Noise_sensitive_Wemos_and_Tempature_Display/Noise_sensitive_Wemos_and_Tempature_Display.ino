@@ -131,6 +131,8 @@ void displayText(){ //display things on screen
   display.setCursor(0,0);
   display.setTextColor(SSD1306_WHITE);//display.setTextSize(1); 
 }
+void turnOnWemos();
+void turnOffWemos();
 void printIP() {
   Serial.printf("My IP address: ");
   for (byte thisByte = 0; thisByte < 3; thisByte++) {
