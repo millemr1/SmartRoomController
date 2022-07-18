@@ -16,6 +16,16 @@
  int averagedReadings;
  int lastSound;
 
+
+const int screeenWidth = 128;
+const int; screenHeight = 64;
+const int screenAddress= 0x3C;  //Screen Address (I think)
+const sensorAddress = 0x76; //temp, press, and sensor adress on breadboard
+const int  OLEDReset = -1;
+ 
+Adafruit_BME280 bme;   //declare objects
+Adafruit_SSD1306 display(screenWidth , screenHeight, &Wire, OLEDReset);
+
 void setup() {
 
   Serial.begin(9600);
@@ -26,7 +36,11 @@ void setup() {
   delay(200);
   printIP();   
   Serial.printf("LinkStatus: %i \n", Ethernet.linkStatus());  // making sure we have a connection and IP address for the network in the room
-  
+
+  display.begin();
+  display.display();
+ 
+ 
  // pinMode(4, OUTPUT);
 //  digitalWrite(4, HIGH);
 }
@@ -35,9 +49,12 @@ void loop() {
   averagedReadings = averageMicrophoneReadings();
   if (averagedReadings > 550) {    //turn the lights in the room on if sound has been heard
     turnLightsOn();
+    displayText();
+    takeReadings();
     lastSound =  millis();
     }                          
-  if (millis()-lastSound > 3000){
+  if (millis()-lastSound > 300000){
+    display.clearDisplay(); //turn off the display when not heard
     turnLightsOff();
     lastSound = millis();
     }
@@ -79,7 +96,29 @@ void turnLightsOff(){
         setHue(lightNumber, false, HueRainbow[(lightNumber%7)-1], 0, 0);
         }
       }
+void takeReadings(){     // take and convert temperature and pressure readings and display them on the screen
+  float tempC;
+  float pressPA;
+  float humidRH;
+  float roomTempF;
 
+ tempC= bme.readTemperature();
+ pressPA = bme.readPressure();
+ humidRH = bme.readHumidity();
+ humidRH = bme.readHumidity(); 
+ roomTempF = (tempC*1.8)+32  // convert to Celcius to Farenheit degrees
+ pressHG =  (pressPA)*(1/3386.39); //convert from Pascals to units of mercury
+ display.printf(" Welcome, Micalah! \n Temp: %0.2f%c \n Pressure: %0.2f \n Humidity: %0.2f \n" ,roomtempF,0xF8, pressureHG,humidRH);
+ display.display();
+}
+
+void displayText(){ //display things on screen
+
+  display.clearDisplay();  //display.clearDisplay();
+  display.setTextSize(1); // Normal 1:1 pixel size will help with font
+  display.setCursor(0,0);
+  display.setTextColor(SSD1306_WHITE);//display.setTextSize(1); 
+}
 void printIP() {
   Serial.printf("My IP address: ");
   for (byte thisByte = 0; thisByte < 3; thisByte++) {
