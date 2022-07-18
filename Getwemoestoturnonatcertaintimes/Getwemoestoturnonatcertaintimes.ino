@@ -12,6 +12,8 @@
 #include <Timelib.h>
 #include <Ethernet.h>
 
+//int currentTimeforWemos;
+int specficTime;
 bool status;
 byte thisbyte;  //for ip address
 void setup() {
@@ -32,14 +34,11 @@ void setup() {
     Serial.printf("%i.",Ethernet.localIP()[thisbyte]);
     }
  Serial.printf("%i\n",Ethernet.localIP()[thisbyte]);
- 
 }
-
 void loop() {
   //currentTimeforWemos = millis();
-  currentTime = getCurrentTime();
-  specficTime = setSpecifiedTime(15,59,00);
-  //getCurrentTime(currentTime);
+  currentTime = getCurrentTime();  //somehow this feels redundant
+  specficTime = setSpecifiedTime(15,59,00);  //somehow this also feels redundant
   timesMatched = DoTimesMatch(currentTime, specificTime);
   if(timesMatched(currentTime, specificTime){   //Keep wemo on for a few minutes would be something like 
      switchON(3);
