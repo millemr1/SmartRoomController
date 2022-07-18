@@ -54,8 +54,8 @@ void loop() {
     takeReadings();
     lastSound =  millis();
     }                          
-  if (millis()-lastSound > 300000){
-    display.clearDisplay(); //turn off the display when sound is not heard
+  if (millis()-lastSound > 5000){
+    display.clearDisplay();//turn off the display when sound is not heard
     turnLightsOff();
     lastSound = millis();
     }
@@ -110,12 +110,12 @@ void takeReadings(){     // take and convert temperature and pressure readings a
  humidRH = bme.readHumidity(); 
  roomTempF = (tempC*1.8)+32;  // convert to Celcius to Farenheit degrees
  pressureHG =  (pressPA)*(1/3386.39); //convert from Pascals to units of mercury
+ display.clearDisplay();
  display.printf(" Welcome, Micalah! \n Temp: %0.2f%c \n Pressure: %0.2f \n Humidity: %0.2f \n" ,roomTempF, pressureHG,humidRH);
  display.display();
 }
 
 void displayText(){ //display things on screen
-
   display.clearDisplay();  //display.clearDisplay();
   display.setTextSize(1); // Normal 1:1 pixel size will help with font
   display.setCursor(0,0);
