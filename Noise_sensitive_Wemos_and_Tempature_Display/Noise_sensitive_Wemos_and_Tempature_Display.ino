@@ -38,7 +38,8 @@ void setup() {
   printIP();   
   Serial.printf("LinkStatus: %i \n", Ethernet.linkStatus());  // making sure we have a connection and IP address for the network in the room
 
-  display.begin(SSD1306_SWITCHCAPVCC,screenAddress);  //
+  bme.begin(sensorAddress); // initialize bme address
+  display.begin(SSD1306_SWITCHCAPVCC,screenAddress);  // initialize display 
   display.display();
 
  // pinMode(4, OUTPUT);
@@ -114,12 +115,12 @@ Serial.printf("before readings");
  tempC= bme.readTemperature();
  pressPA = bme.readPressure();
  humidRH = bme.readHumidity();
- Serial.printf("after readings");
+ Serial.printf("humidity: %0.2f \n", humidRH);
  roomTempF = (tempC*1.8)+32;  // convert to Celcius to Farenheit degrees
  pressureHG =  (pressPA)*(1/3386.39); //convert from Pascals to units of mercury
  //display.clearDisplay();
  Serial.printf("cleared");
- display.printf(" Welcome, Micalah! \n Temp: %0.2f%c \n Pressure: %0.2f \n Humidity: %0.2f \n" ,roomTempF, pressureHG,humidRH);
+ display.printf(" Welcome, Micalah! \n Temp: %0.2f \n Pressure: %0.2f \n Humidity: %0.2f \n" ,roomTempF, pressureHG,humidRH);
  display.display();
 }
 
