@@ -4,16 +4,16 @@
  * July-14-2022
 */
 
+
 #include<SPI.h>
-#include<mac.h>
-#include<hue.h>
-#include<Wire.h>
 #include <wemo.h>
-#include <Timelib.h>
-#include <Ethernet.h>
+#include<mac.h>
+#include <TimeLib.h>
+
 
 //int currentTimeforWemos;
 int specficTime;
+int currentTime;
 bool status;
 byte thisbyte;  //for ip address
 void setup() {
@@ -22,7 +22,9 @@ void setup() {
   
   pinMode(10, OUTPUT);  // enables serial monitor pin
   digitalWrite(10, HIGH);
-  status = Ethernet.begin(mac);    //begin ethernet connection
+  status = Ethernet.begin(mac); //begin ethernet connection
+  delay(200);
+  printIP();
   if (!status) {
     Serial.printf("failed to configure Ethernet using DHCP \n");
     //no point in continueing 
@@ -38,7 +40,7 @@ void setup() {
 void loop() {
   //currentTimeforWemos = millis();
   currentTime = getCurrentTime();  //somehow this feels redundant
-  specficTime = setSpecifiedTime(15,59,00);  //somehow this also feels redundant
+  specficTime = setSpecifiedTime(16,20,01);  //somehow this also feels redundant
   timesMatched = DoTimesMatch(currentTime, specificTime);
   if(timesMatched(currentTime, specificTime){   //Keep wemo on for a few minutes would be something like 
      switchON(3);
@@ -67,7 +69,7 @@ bool DoTimesMatch(int time1, int time2){
     timesMatch = true;
   }
  else{
-   timesMath = false;
+   timesMatch = false;
   }
  return timesMatch;
 }
