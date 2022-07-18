@@ -5,16 +5,15 @@
 */
 
 #include<SPI.h>
-#include <Ethernet.h>
 #include<mac.h>
 #include<hue.h>
 #include<Wire.h>
-#include <Wemo.h>
+#include <wemo.h>
 #include <Timelib.h>
+#include <Ethernet.h>
 
 bool status;
 byte thisbyte;  //for ip address
-
 void setup() {
   
   Serial.begin(9600);
@@ -39,13 +38,13 @@ void setup() {
 void loop() {
   //currentTimeforWemos = millis();
   currentTime = getCurrentTime();
-  specficTime = (15,37,00);
+  specficTime = setSpecifiedTime(15,59,00);
   //getCurrentTime(currentTime);
   timesMatched = DoTimesMatch(currentTime, specificTime);
   if(timesMatched(currentTime, specificTime){   //Keep wemo on for a few minutes would be something like 
      switchON(3);
   }
- // else();
+  //else();
  // switchOFF(3);
   }
 
