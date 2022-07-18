@@ -38,24 +38,28 @@ void setup() {
   printIP();   
   Serial.printf("LinkStatus: %i \n", Ethernet.linkStatus());  // making sure we have a connection and IP address for the network in the room
 
-  display.begin();
+  display.begin(SSD1306_SWITCHCAPVCC,screenAddress);  //
   display.display();
- 
- 
+
  // pinMode(4, OUTPUT);
 //  digitalWrite(4, HIGH);
 }
 
 void loop() {
   averagedReadings = averageMicrophoneReadings();
-  if (averagedReadings > 550) {    //turn the lights in the room on if sound has been heard
+  if (averagedReadings > 650) {    //turn the lights in the room on if sound has been heard
+    Serial.printf("sound has been detected lights will be on soon");
     turnLightsOn();
+    Serial.printf("the lights on function worked");
     displayText();
+    Serial.printf("the display worked");
     takeReadings();
+    Serial.printf("readings were taked");
     lastSound =  millis();
     }                          
-  if (millis()-lastSound > 5000){
-    display.clearDisplay();//turn off the display when sound is not heard
+  if (millis()-lastSound > 2000){
+    display.clearDisplay();
+    Serial.printf("sound has not been detected for 5 seconds turning lights off");//turn off the display when sound is not heard
     turnLightsOff();
     lastSound = millis();
     }
@@ -89,6 +93,7 @@ void turnLightsOn(){  //get all smart lights in room to turn on I think
  int lightNumber;
     for (lightNumber = 1; lightNumber < 7; lightNumber++){
     setHue(lightNumber, true, HueRainbow[(lightNumber%7)-1], 150, 255);  //get to start 
+    Serial.printf("lights are on");
     }      
 }
 void turnLightsOff(){
@@ -96,6 +101,7 @@ void turnLightsOff(){
       for(lightNumber = 1; lightNumber < 7; lightNumber++){
         setHue(lightNumber, false, HueRainbow[(lightNumber%7)-1], 0, 0);
         }
+        Serial.printf("lights are off");
       }
 void takeReadings(){     // take and convert temperature and pressure readings and display them on the screen
   float tempC;
@@ -104,18 +110,21 @@ void takeReadings(){     // take and convert temperature and pressure readings a
   float roomTempF;
   float pressureHG;
 
+Serial.printf("before readings");
  tempC= bme.readTemperature();
  pressPA = bme.readPressure();
  humidRH = bme.readHumidity();
- humidRH = bme.readHumidity(); 
+ Serial.printf("after readings");
  roomTempF = (tempC*1.8)+32;  // convert to Celcius to Farenheit degrees
  pressureHG =  (pressPA)*(1/3386.39); //convert from Pascals to units of mercury
- display.clearDisplay();
+ //display.clearDisplay();
+ Serial.printf("cleared");
  display.printf(" Welcome, Micalah! \n Temp: %0.2f%c \n Pressure: %0.2f \n Humidity: %0.2f \n" ,roomTempF, pressureHG,humidRH);
  display.display();
 }
 
 void displayText(){ //display things on screen
+  Serial.printf("texts should be displaying");
   display.clearDisplay();  //display.clearDisplay();
   display.setTextSize(1); // Normal 1:1 pixel size will help with font
   display.setCursor(0,0);
