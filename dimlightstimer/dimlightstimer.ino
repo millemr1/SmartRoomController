@@ -26,24 +26,23 @@ void loop() {
 
 void makeLightsDim(){    //dim lights at specific time
  int currentTime = getCurrentTime();
- int dimLightsTime =  setSpecifiedTime(16,00);
+ int dimLightsTime =  setSpecifiedTime(16,47);
  int brightness;
  static bool dimState = false;
  int lightNumber;
- int startMinute;
- int endMinute;
-  if(DoTimesMatch(dimLightsTime, currentTime)){
+ static int startMinute;
+ static int endMinute;
+  if(DoTimesMatch(dimLightsTime, currentTime) && !dimState){
        dimState = true;
        Serial.printf("dim state enabled \n");
        turnLightsOn();
-       startMinute = minute();   // I could consolidate these but I will confuse myself if I do.
+       startMinute = getCurrentTime();   // I could consolidate these but I will confuse myself if I do.
        endMinute = startMinute + 5;
    }
   if(dimState){
-    minute();
     Serial.printf("dim state true \n");
-   if(minute() > startMinute && minute() < endMinute){
-     brightness = 250 - ((minute()-startMinute)*50);//incrementally decreasing my lights
+   if(currentTime > startMinute && currentTime < endMinute){
+     brightness = 250 - ((currentTime-startMinute)*50);//incrementally decreasing my lights
      Serial.printf("Brightness: i% \n" , brightness);
       for (lightNumber = 1; lightNumber < 7; lightNumber++){
         setHue(1, true, HueRainbow[(lightNumber%7)-1], brightness, 255);  //
@@ -51,7 +50,7 @@ void makeLightsDim(){    //dim lights at specific time
       }                                   
    }
   }
-    //else{
+  
   if(brightness <= 0){
     dimState = false;
    }
