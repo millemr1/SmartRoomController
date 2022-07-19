@@ -27,33 +27,35 @@ void loop() {
 
 void makeLightsDim(){    //dim lights at specific time
  int currentTime = getCurrentTime();
- int dimLightsTime =  setSpecifiedTime(2,36,00);
- int  minutes = minute();
- int m = minutes%60;
+ int dimLightsTime =  setSpecifiedTime(3,07,00);;
  int brightness;
  bool dimState = false;
- int lightNumber;
+ //int lightNumber;
+ int startMinute;
+ int endMinute;
   if(DoTimesMatch(dimLightsTime, currentTime)){
        dimState = !dimState;
        Serial.printf("dim state enabled \n");
        turnLightsOn();
+       startMinute = minute();   // I could consolidate these but I will confuse myself if I do.
+       endMinute = startMinute + 5;
    }
   if(dimState){
-   if(m > 5 && m < 10){
-     brightness = 250 - ((m-5)*50);//incrementally decreasing my lights
-      for (lightNumber = 1; lightNumber < 7; lightNumber++){
-        setHue(lightNumber, true, HueRainbow[(lightNumber%7)-1], brightness, 255);
+   if(currentTime < startMinute && currentTime < endMinute){
+     brightness = 250 - ((currentTime-5)*50);//incrementally decreasing my lights
+      for (lightNumber = 1; lightNumber < 7; lightNumber++){}
+        setHue(1, true, HueRainbow[(lightNumber%7)-1], brightness, 255);  //
         Serial.printf("Lights are dimming");
       }                                   
    }
-  }
-  else{
-    if(m > 10){
-      turnLightsOff();
-      brightness = 250;
-      Serial.printf("else case fulfilled");
-    }
-  }
+  
+  //else{
+   // if(m > 10){
+     // turnLightsOff();
+     // brightness = 250;
+     // Serial.printf("else case fulfilled");
+   // }
+  //}
   dimState = false;
 }
 
@@ -131,4 +133,4 @@ void turnLightsOff(){
         setHue(lightNumber, false, HueRainbow[(lightNumber%7)-1], 0, 0);
         }
         Serial.printf("lights are off");
-      }
+}
