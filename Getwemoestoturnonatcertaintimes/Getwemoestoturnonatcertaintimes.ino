@@ -11,8 +11,8 @@
 #include<mac.h>
 #include <TimeLib.h>
 
-
-//int currentTimeforWemos;
+int currentTimeforWemos;
+int lastTimeforWemos;
 int specTime;
 int currentTiming;
 bool timesMatched;
@@ -41,17 +41,20 @@ void setup() {
 }
 void loop() {
   
-  currentTiming = getCurrentTime();  //somehow this feels redundant
-  specTime= setSpecifiedTime(10,21,00);  //somehow this also feels redundant
+currentTiming = getCurrentTime();  //somehow this feels redundant
+specTime= setSpecifiedTime(10,46,00);  //somehow this also feels redundant
   //timesMatched = DoTimesMatch(currentTiming, specTime);
-  if(DoTimesMatch(currentTiming, specTime)){   //Keep wemo on for a few minutes would be something like 
-     Serial.printf("times match");
-     switchON(4);
-     turnWemoOffAfter3Minutes(4); 
-  }
-  //else();
- // switchOFF(3);
-  digitalClockDisplay();  
+    if(DoTimesMatch(currentTiming, specTime)){   //Keep wemo on for a few minutes would be something like 
+     Serial.printf("times match turning wemo on \n");
+     switchON(4); 
+      }
+currentTimeforWemos = millis();
+    if(currentTimeforWemos - lastTimeforWemos > 30000) {
+      switchOFF(4);
+    lastTimeforWemos = millis();
+    Serial.printf("turning off wemo \n");
+    } 
+   digitalClockDisplay();  
 }
 int getCurrentTime(){ //try to write to get it on at anytime I pass into the function
   int currentTime;
@@ -115,16 +118,6 @@ void printDigits(int digits){
   if(digits < 10)
     Serial.print('0');
   Serial.print(digits);
-}
-
-void turnWemoOffAfter3Minutes(int wemoNumber){ //turn Wemo off for 3 minutes
-  int currentTimeforWemos = millis();
-  int lastTimeforWemos;
-  if(currentTimeforWemos - lastTimeforWemos > 180000) {
-    switchOFF(wemoNumber);
-    lastTimeforWemos = millis();
-    Serial.printf("turning off wemo");
-    } 
 }
 
 

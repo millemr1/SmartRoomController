@@ -11,23 +11,33 @@
 #include<Adafruit_GFX.h>
 #include <Adafruit_BME280.h>
 #include<Wire.h>
+#include <TimeLib.h>
+#include <wemo.h>
 
 
- byte thisByte;   //for ethernet IP address
- int averagedReadings;
- int lastSound;
 
+byte thisByte;   //for ethernet IP address
+int averagedReadings;
+int lastSound;
 
 const int screenWidth = 128;
 const int screenHeight = 64;
 const int screenAddress= 0x3C;  //Screen Address (I think)
 const int sensorAddress = 0x76; //temp, press, and sensor adress on breadboard
 const int  OLEDReset = -1;
+
+int currentTimeforWemos;
+int lastTimeforWemos;
+int specTime;
+int currentTiming;
+bool timesMatched;
  
 Adafruit_BME280 bme;   //declare objects
 Adafruit_SSD1306 display(screenWidth , screenHeight, &Wire, OLEDReset);
 
 void setup() {
+     // set the Time library to use Teensy 3.0's RTC to keep time
+ setSyncProvider(getTeensy3Time); 
 
   Serial.begin(9600);
   pinMode(A9, INPUT);  // pin for reading
@@ -47,8 +57,8 @@ void setup() {
 }
 
 void loop() {
-  averagedReadings = averageMicrophoneReadings();
-  if (averagedReadings > 650) {    //turn the lights in the room on if sound has been heard
+ averagedReadings = averageMicrophoneReadings();
+ if (averagedReadings > 650) {    //turn the lights in the room on if sound has been heard
     Serial.printf("sound has been detected lights will be on soon");
     turnLightsOn();
     Serial.printf("the lights on function worked");
@@ -57,14 +67,27 @@ void loop() {
     takeReadings();
     Serial.printf("readings were taked");
     lastSound =  millis();
-    }                          
-  if (millis()-lastSound > 2000){
+ }                          
+ if (millis()-lastSound > 2000){  //turn of sound if light hasn't been heard
     display.clearDisplay();
     Serial.printf("sound has not been detected for 5 seconds turning lights off");//turn off the display when sound is not heard
     turnLightsOff();
     lastSound = millis();
-    }
-    
+ }   
+currentTiming = getCurrentTime();  //somehow this feels redundant
+specTime= setSpecifiedTime(10,46,00);  //somehow this also feels redundant
+  //timesMatched = DoTimesMatch(currentTiming, specTime);
+    if(DoTimesMatch(currentTiming, specTime)){   //Keep wemo on for a few minutes would be something like 
+     Serial.printf("times match turning wemo on \n");
+     switchON(4); 
+      }
+currentTimeforWemos = millis();
+    if(currentTimeforWemos - lastTimeforWemos > 30000) {
+      switchOFF(4);
+    lastTimeforWemos = millis();
+    Serial.printf("turning off wemo \n");
+    } 
+   digitalClockDisplay();  
 }
 
 int averageMicrophoneReadings(){
@@ -139,4 +162,65 @@ void printIP() {
   Serial.printf("%i.",Ethernet.localIP()[thisByte]);
  }
  Serial.printf("%i\n",Ethernet.localIP()[3]);
+}
+int getCurrentTime(){ //try to write to get it on at anytime I pass into the function
+  int currentTime;
+  int hours = hour();
+  int minutes = minute();
+  int seconds = second();  //might be extraneous?
+  currentTime = hours + minutes + seconds;
+  Serial.printf("Time: %i : %i, : %i \n", hours, minutes, seconds);  // have it display to screen eventually?
+    return currentTime;
+ }
+  int setSpecifiedTime(int hours, int minutes, int seconds){  //I am quite unsure what I am doing here
+  int certainTime = hours + minutes + seconds;
+  return certainTime;
+}
+bool DoTimesMatch(int time1, int time2){
+  bool timesMatch;
+  if (time1 == time2){  //this is most certainly wrong
+    timesMatch = true;
+  }
+ else{
+   timesMatch = false;
+  }
+ return timesMatch;
+}time_t getTeensy3Time() {
+  return Teensy3Clock.get();
+}
+/*  code to process time sync messages from the serial port   */
+#define TIME_HEADER  "T"   // Header tag for serial time sync message
+unsigned long processSyncMessage() {
+  unsigned long pctime = 0L;
+  const unsigned long DEFAULT_TIME = 1357041600; // Jan 1 2013 
+
+  if(Serial.find(TIME_HEADER)) {
+     pctime = Serial.parseInt();
+     return pctime;
+     if( pctime < DEFAULT_TIME) { // check the value is a valid time (greater than Jan 1 2013)
+       pctime = 0L; // return 0 to indicate that the time is not valid
+     }
+  }
+  return pctime;
+}
+
+void digitalClockDisplay() {
+  // digital clock display of the time
+  Serial.print(hour());
+  printDigits(minute());
+  printDigits(second());
+  Serial.print(" ");
+  Serial.print(day());
+  Serial.print(" ");
+  Serial.print(month());
+  Serial.print(" ");
+  Serial.print(year()); 
+  Serial.println(); 
+}
+void printDigits(int digits){
+  // utility function for digital clock display: prints preceding colon and leading 0
+  Serial.print(":");
+  if(digits < 10)
+    Serial.print('0');
+  Serial.print(digits);
 }
