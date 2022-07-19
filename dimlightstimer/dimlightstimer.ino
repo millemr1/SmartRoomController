@@ -26,14 +26,14 @@ void loop() {
 
 void makeLightsDim(){    //dim lights at specific time
  int currentTime = getCurrentTime();
- int dimLightsTime =  setSpecifiedTime(13,01,00);
+ int dimLightsTime =  setSpecifiedTime(13,9,00);
  int  m = minute();
  int brightness;
  bool dimState;
  int lightNumber;
   if(DoTimesMatch(dimLightsTime, currentTime)){
        dimState = !dimState;
-       Serial.printf("dim state enabled");
+       Serial.printf("dim state enabled \n");
    }
    if(dimState){
    if(m > 5 && m < 10){
@@ -44,7 +44,9 @@ void makeLightsDim(){    //dim lights at specific time
       }                                   
       if(!hueOn){    //or HueOn =  false turn lights on if they are off
         turnLightsOn();
+        for (lightNumber = 1; lightNumber < 7; lightNumber++){
         setHue(lightNumber, true, HueRainbow[(lightNumber%7)-1], brightness, 255);
+        }
         Serial.printf("lights should be dimming but they were off");
        }     
      }
