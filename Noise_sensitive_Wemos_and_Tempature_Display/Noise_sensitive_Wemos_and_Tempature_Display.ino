@@ -204,7 +204,6 @@ unsigned long processSyncMessage() {
   }
   return pctime;
 }
-
 void digitalClockDisplay() {
   // digital clock display of the time
   Serial.print(hour());
