@@ -5,7 +5,6 @@
 #include <TimeLib.h>
 void setup() {
  setSyncProvider(getTeensy3Time); 
-  turnLightsOff();
   Serial.begin(9600);
   while (!Serial);  // Wait for Arduino Serial Monitor to open
   delay(100);
@@ -18,6 +17,7 @@ void setup() {
   digitalWrite(10, HIGH);
   Ethernet.begin(mac); //begin ethernet connection
   delay(200);
+  turnLightsOff();
 //  printIP();
 }
 void loop() {
@@ -26,13 +26,15 @@ void loop() {
 
 void makeLightsDim(){    //dim lights at specific time
  int currentTime = getCurrentTime();
- int dimLightsTime =  setSpecifiedTime(17,00);
- int brightness;
+ int dimLightsTime =  setSpecifiedTime(17,48);
+ static int brightness=250;
  static bool dimState = false;
  int lightNumber;
  static int startMinute;
  static int endMinute;
  int lastTime;
+
+ Serial.printf("dimSum %i, current %i, difference %i\n",dimLightsTime, currentTime, currentTime - dimLightsTime);
   if(DoTimesMatch(dimLightsTime, currentTime) && !dimState){
        dimState = true;
        Serial.printf("dim state enabled \n");
@@ -42,21 +44,23 @@ void makeLightsDim(){    //dim lights at specific time
    }
   if(dimState){
     Serial.printf("dim state true \n");
+    Serial.printf("Prepare to be dim --- dimSum %i, current %i, difference %i\n",dimLightsTime, currentTime, currentTime - dimLightsTime);
    if(currentTime > startMinute && currentTime < endMinute){
      brightness = 250 - ((currentTime-startMinute)*50);//incrementally decreasing my lights
      Serial.printf("Brightness: i% \n" , brightness);
      if(currentTime != lastTime){
       for (lightNumber = 1; lightNumber < 7; lightNumber++){
-        setHue(1, true, HueRainbow[(lightNumber%7)-1], brightness, 255);  //
+        setHue(lightNumber, true, HueRainbow[(lightNumber%7)-1], brightness, 255);  //
         Serial.printf("Lights are dimming");
         lastTime = getCurrentTime();
        }
-     }                                   
+      }                                   
    }
   }
-  
-  if(brightness <= 0){
+  if((brightness <= 0) && dimState){
+    Serial.printf("Setting Dimsum to false\n");
     dimState = false;
+    delay(60000);
    }
 }
 void digitalClockDisplay() {
@@ -107,8 +111,6 @@ int getCurrentTime(){ //try to write to get it on at anytime I pass into the fun
     return currentTime;
   }
 int setSpecifiedTime(int hours, int minutes){  
-  minutes = minute();
-  hours = hour();
   int certainTime =(hours*60)+minutes;
   return certainTime;
 }
