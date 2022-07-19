@@ -14,8 +14,6 @@
 #include <TimeLib.h>
 #include <wemo.h>
 
-
-
 byte thisByte;   //for ethernet IP address
 int averagedReadings;
 int lastSound;
@@ -28,7 +26,8 @@ const int  OLEDReset = -1;
 
 int currentTimeforWemos;
 int lastTimeforWemos;
-int specTime;
+int TeaTime;
+int BedTime;
 int currentTiming;
 bool timesMatched;
  
@@ -50,13 +49,9 @@ void setup() {
 
   bme.begin(sensorAddress); // initialize bme address
   display.begin(SSD1306_SWITCHCAPVCC,screenAddress);  // initialize display 
-  display.display();
-
- // pinMode(4, OUTPUT);
-//  digitalWrite(4, HIGH);
+  display.display(); 
 }
-
-void loop() {
+void loop(){
  averagedReadings = averageMicrophoneReadings();
  if (averagedReadings > 650) {    //turn the lights in the room on if sound has been heard
     Serial.printf("sound has been detected lights will be on soon");
@@ -65,7 +60,7 @@ void loop() {
     displayText();
     Serial.printf("the display worked");
     takeReadings();
-    Serial.printf("readings were taked");
+    Serial.printf("readings were taken");
     lastSound =  millis();
  }                          
  if (millis()-lastSound > 2000){  //turn of sound if light hasn't been heard
@@ -75,15 +70,21 @@ void loop() {
     lastSound = millis();
  }   
 currentTiming = getCurrentTime();  //somehow this feels redundant
-specTime= setSpecifiedTime(10,46,00);  //somehow this also feels redundant
-  //timesMatched = DoTimesMatch(currentTiming, specTime);
-    if(DoTimesMatch(currentTiming, specTime)){   //Keep wemo on for a few minutes would be something like 
-     Serial.printf("times match turning wemo on \n");
-     switchON(4); 
+TeaTime = setSpecifiedTime(11,19,00);  //somehow this also feels redundant
+BedTime = setSpecifiedTime(11,16,00);
+
+   if(DoTimesMatch(TeaTime,currentTiming)){   //Keep wemo on for a few minutes would be something like 
+    Serial.printf("times match turning wemo 4 on \n");
+    switchON(4); 
+     }
+    if(DoTimesMatch(BedTime, currentTiming)){
+      Serial.printf("turning Wemo 0 on");
+      switchON(0);
       }
 currentTimeforWemos = millis();
     if(currentTimeforWemos - lastTimeforWemos > 30000) {
       switchOFF(4);
+      switchOFF(0);
     lastTimeforWemos = millis();
     Serial.printf("turning off wemo \n");
     } 
