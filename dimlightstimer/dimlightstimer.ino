@@ -26,12 +26,13 @@ void loop() {
 
 void makeLightsDim(){    //dim lights at specific time
  int currentTime = getCurrentTime();
- int dimLightsTime =  setSpecifiedTime(16,47);
+ int dimLightsTime =  setSpecifiedTime(17,00);
  int brightness;
  static bool dimState = false;
  int lightNumber;
  static int startMinute;
  static int endMinute;
+ int lastTime;
   if(DoTimesMatch(dimLightsTime, currentTime) && !dimState){
        dimState = true;
        Serial.printf("dim state enabled \n");
@@ -44,10 +45,13 @@ void makeLightsDim(){    //dim lights at specific time
    if(currentTime > startMinute && currentTime < endMinute){
      brightness = 250 - ((currentTime-startMinute)*50);//incrementally decreasing my lights
      Serial.printf("Brightness: i% \n" , brightness);
+     if(currentTime != lastTime){
       for (lightNumber = 1; lightNumber < 7; lightNumber++){
         setHue(1, true, HueRainbow[(lightNumber%7)-1], brightness, 255);  //
         Serial.printf("Lights are dimming");
-      }                                   
+        lastTime = getCurrentTime();
+       }
+     }                                   
    }
   }
   
@@ -122,8 +126,8 @@ void turnLightsOn(){  //get all smart lights in room to turn on I think
  int lightNumber;
     for (lightNumber = 1; lightNumber < 7; lightNumber++){
     setHue(lightNumber, true, HueRainbow[(lightNumber%7)-1], 150, 255);  //get to start 
-    Serial.printf("lights are on");
-    }      
+    }   
+    Serial.printf("lights are on");   
 }
 void turnLightsOff(){
   int lightNumber;
