@@ -27,7 +27,7 @@ void loop() {
 
 void makeLightsDim(){    //dim lights at specific time
  int currentTime = getCurrentTime();
- int dimLightsTime =  setSpecifiedTime(2,05,00);
+ int dimLightsTime =  setSpecifiedTime(2,36,00);
  int  minutes = minute();
  int m = minutes%60;
  int brightness;
@@ -36,7 +36,7 @@ void makeLightsDim(){    //dim lights at specific time
   if(DoTimesMatch(dimLightsTime, currentTime)){
        dimState = !dimState;
        Serial.printf("dim state enabled \n");
-       turnLightsOn()
+       turnLightsOn();
    }
   if(dimState){
    if(m > 5 && m < 10){
@@ -49,6 +49,7 @@ void makeLightsDim(){    //dim lights at specific time
   }
   else{
     if(m > 10){
+      turnLightsOff();
       brightness = 250;
       Serial.printf("else case fulfilled");
     }
