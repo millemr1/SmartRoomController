@@ -21,7 +21,7 @@ byte thisbyte;  //for ip address
 void setup() {
   
    // set the Time library to use Teensy 3.0's RTC to keep time
-  setSyncProvider(getTeensy3Time);  //what goes through here?
+//  setSyncProvider(getTeensy3Time);  //what goes through here?
   
   Serial.begin(9600);
   while (!Serial);  // Wait for Arduino Serial Monitor to open
@@ -31,7 +31,6 @@ void setup() {
   } else {
     Serial.println("RTC has set the system time");
   }
-}
   
   pinMode(10, OUTPUT);  // enables serial monitor pin
   digitalWrite(10, HIGH);
