@@ -20,45 +20,46 @@ void setup() {
   delay(200);
 //  printIP();
 }
-
 void loop() {
   makeLightsDim();
 }
 
 void makeLightsDim(){    //dim lights at specific time
  int currentTime = getCurrentTime();
- int dimLightsTime =  setSpecifiedTime(3,07,00);;
+ int dimLightsTime =  setSpecifiedTime(15,27,00);
  int brightness;
  bool dimState = false;
- //int lightNumber;
+ int lightNumber;
  int startMinute;
  int endMinute;
   if(DoTimesMatch(dimLightsTime, currentTime)){
        dimState = !dimState;
        Serial.printf("dim state enabled \n");
        turnLightsOn();
-       startMinute = minute();   // I could consolidate these but I will confuse myself if I do.
+       startMinute = hour()+minute()+second();   // I could consolidate these but I will confuse myself if I do.
        endMinute = startMinute + 5;
    }
   if(dimState){
-   if(currentTime < startMinute && currentTime < endMinute){
+   if(startMinute < endMinute && currentTime < endMinute){
      brightness = 250 - ((currentTime-5)*50);//incrementally decreasing my lights
-      for (lightNumber = 1; lightNumber < 7; lightNumber++){}
+     Serial.printf("Brightness: i% \n" , brightness);
+      for (lightNumber = 1; lightNumber < 7; lightNumber++){
         setHue(1, true, HueRainbow[(lightNumber%7)-1], brightness, 255);  //
         Serial.printf("Lights are dimming");
       }                                   
    }
-  
-  //else{
-   // if(m > 10){
-     // turnLightsOff();
+  }
+    //else{
+      //if( > 10){
+      //turnLightsOff();
      // brightness = 250;
      // Serial.printf("else case fulfilled");
    // }
   //}
-  dimState = false;
+  if(brightness <= 0){
+    dimState = false;
+   }
 }
-
 void digitalClockDisplay() {
   // digital clock display of the time
   Serial.print(hour());
