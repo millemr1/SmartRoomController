@@ -42,13 +42,12 @@ void setup() {
 void loop() {
   
   currentTiming = getCurrentTime();  //somehow this feels redundant
-  specTime= setSpecifiedTime(9,59,00);  //somehow this also feels redundant
+  specTime= setSpecifiedTime(10,21,00);  //somehow this also feels redundant
   //timesMatched = DoTimesMatch(currentTiming, specTime);
   if(DoTimesMatch(currentTiming, specTime)){   //Keep wemo on for a few minutes would be something like 
      Serial.printf("times match");
      switchON(4);
-
-     
+     turnWemoOffAfter3Minutes(4); 
   }
   //else();
  // switchOFF(3);
@@ -118,12 +117,13 @@ void printDigits(int digits){
   Serial.print(digits);
 }
 
-void turnWemoOffAfter3Minutes(int wemoNumber){ //turn Wemo on for 3 minutes
+void turnWemoOffAfter3Minutes(int wemoNumber){ //turn Wemo off for 3 minutes
   int currentTimeforWemos = millis();
   int lastTimeforWemos;
   if(currentTimeforWemos - lastTimeforWemos > 180000) {
     switchOFF(wemoNumber);
     lastTimeforWemos = millis();
+    Serial.printf("turning off wemo");
     } 
 }
 
