@@ -26,22 +26,24 @@ void loop() {
 
 void makeLightsDim(){    //dim lights at specific time
  int currentTime = getCurrentTime();
- int dimLightsTime =  setSpecifiedTime(15,27,00);
+ int dimLightsTime =  setSpecifiedTime(16,00);
  int brightness;
- bool dimState = false;
+ static bool dimState = false;
  int lightNumber;
  int startMinute;
  int endMinute;
   if(DoTimesMatch(dimLightsTime, currentTime)){
-       dimState = !dimState;
+       dimState = true;
        Serial.printf("dim state enabled \n");
        turnLightsOn();
-       startMinute = hour()+minute()+second();   // I could consolidate these but I will confuse myself if I do.
+       startMinute = minute();   // I could consolidate these but I will confuse myself if I do.
        endMinute = startMinute + 5;
    }
   if(dimState){
-   if(startMinute < endMinute && currentTime < endMinute){
-     brightness = 250 - ((currentTime-5)*50);//incrementally decreasing my lights
+    minute();
+    Serial.printf("dim state true \n");
+   if(minute() > startMinute && minute() < endMinute){
+     brightness = 250 - ((minute()-startMinute)*50);//incrementally decreasing my lights
      Serial.printf("Brightness: i% \n" , brightness);
       for (lightNumber = 1; lightNumber < 7; lightNumber++){
         setHue(1, true, HueRainbow[(lightNumber%7)-1], brightness, 255);  //
@@ -50,12 +52,6 @@ void makeLightsDim(){    //dim lights at specific time
    }
   }
     //else{
-      //if( > 10){
-      //turnLightsOff();
-     // brightness = 250;
-     // Serial.printf("else case fulfilled");
-   // }
-  //}
   if(brightness <= 0){
     dimState = false;
    }
@@ -100,15 +96,17 @@ unsigned long processSyncMessage() {
 }
 int getCurrentTime(){ //try to write to get it on at anytime I pass into the function
   int currentTime;
-  int hours = hour();
+  int hours = hour();  //tells you what minute of the day it is
   int minutes = minute();
-  int seconds = second();  //might be extraneous?
-  currentTime = hours + minutes + seconds;
-  Serial.printf("Time: %i : %i, : %i \n", hours, minutes, seconds);  // have it display to screen eventually?
+  //might be extraneous?
+  currentTime = (hours*60)+minutes;
+  Serial.printf("Time: %i : %i, : %i \n", hours, minutes);  // have it display to screen eventually?
     return currentTime;
   }
-int setSpecifiedTime(int hours, int minutes, int seconds){  //I am quite unsure what I am doing here
-  int certainTime = hours + minutes + seconds;
+int setSpecifiedTime(int hours, int minutes){  
+  minutes = minute();
+  hours = hour();
+  int certainTime =(hours*60)+minutes;
   return certainTime;
 }
 bool DoTimesMatch(int time1, int time2){
