@@ -1,5 +1,5 @@
-/* Project: when noise is a certain level display temperature reading and toggle the lights on and off
- * Descpition: lightup NeoPixels with sound
+/* Project: Smart Room Controller
+ * Descpition: Noise Sensitive Smart Rooom Controller
  * Author:  Micalah Miller
  * July-14-2022
 */
@@ -7,7 +7,6 @@
 #include<Ethernet.h>
 #include <wemo.h>
 #include <mac.h>
-
 #include<hue.h>
 #include <Adafruit_SSD1306.h>
 #include<Adafruit_GFX.h>
