@@ -36,7 +36,7 @@ Adafruit_SSD1306 display(screenWidth , screenHeight, &Wire, OLEDReset);
 
 void setup() {
      // set the Time library to use Teensy 3.0's RTC to keep time
- setSyncProvider(getTeensy3Time); 
+  setSyncProvider(getTeensy3Time); 
 
   Serial.begin(9600);
   pinMode(A9, INPUT);  // pin for reading
@@ -50,6 +50,7 @@ void setup() {
   bme.begin(sensorAddress); // initialize bme address
   display.begin(SSD1306_SWITCHCAPVCC,screenAddress);  // initialize display 
   display.display(); 
+  turnLightsOff();
 }
 void loop(){
  averagedReadings = averageMicrophoneReadings();
@@ -70,8 +71,8 @@ void loop(){
     lastSound = millis();
  }   
 currentTiming = getCurrentTime();  //somehow this feels redundant
-TeaTime = setSpecifiedTime(11,19,00);  //somehow this also feels redundant
-BedTime = setSpecifiedTime(11,16,00);
+TeaTime = setSpecifiedTime(11,19);  //somehow this also feels redundant
+BedTime = setSpecifiedTime(11,16);
 
    if(DoTimesMatch(TeaTime,currentTiming)){   //Keep wemo on for a few minutes would be something like 
     Serial.printf("times match turning wemo 4 on \n");
@@ -89,8 +90,32 @@ currentTimeforWemos = millis();
     Serial.printf("turning off wemo \n");
     } 
    digitalClockDisplay();  
+   makeLightsDim();
 }
-
+int getCurrentTime(){ //try to write to get it on at anytime I pass into the function
+  
+  int currentTime;
+  int hours = hour();  //tells you what minute of the day it is
+  int minutes = minute();
+  //might be extraneous?
+  currentTime = (hours*60)+minutes;
+  Serial.printf("Time: %i : %i, : %i \n", hours, minutes);  // have it display to screen eventually?
+    return currentTime;
+}
+int setSpecifiedTime(int hours, int minutes){
+  int certainTime =(hours*60)+minutes;
+  return certainTime;
+}
+bool DoTimesMatch(int time1, int time2){
+  bool timesMatch;
+  if (time1 == time2){  //this is most certainly wrong
+    timesMatch = true;
+   }
+ else{
+   timesMatch = false;
+  }
+ return timesMatch;
+}
 int averageMicrophoneReadings(){
   int average;
   int summation = 0;
@@ -147,7 +172,45 @@ Serial.printf("before readings");
  display.printf(" Welcome, Micalah! \n Temp: %0.2f \n Pressure: %0.2f \n Humidity: %0.2f \n" ,roomTempF, pressureHG,humidRH);
  display.display();
 }
+void makeLightsDim(){    //dim lights at specific time
+ int currentTime = getCurrentTime();
+ int dimLightsTime =  setSpecifiedTime(17,48);
+ static int brightness=250;
+ static bool dimState = false;
+ int lightNumber;
+ static int startMinute;
+ static int endMinute;
+ int lastTime;
 
+ Serial.printf("dimSum %i, current %i, difference %i\n",dimLightsTime, currentTime, currentTime - dimLightsTime);
+  if(DoTimesMatch(dimLightsTime, currentTime) && !dimState){
+       dimState = true;
+       Serial.printf("dim state enabled \n");
+       turnLightsOn();
+       startMinute = getCurrentTime();   // I could consolidate these but I will confuse myself if I do.
+       endMinute = startMinute + 5;
+   }
+  if(dimState){
+    Serial.printf("dim state true \n");
+    Serial.printf("Prepare to be dim --- dimSum %i, current %i, difference %i\n",dimLightsTime, currentTime, currentTime - dimLightsTime);
+   if(currentTime > startMinute && currentTime < endMinute){
+     brightness = 250 - ((currentTime-startMinute)*50);//incrementally decreasing my lights
+     Serial.printf("Brightness: i% \n" , brightness);
+     if(currentTime != lastTime){
+      for (lightNumber = 1; lightNumber < 7; lightNumber++){
+        setHue(lightNumber, true, HueRainbow[(lightNumber%7)-1], brightness, 255);  //
+        Serial.printf("Lights are dimming");
+        lastTime = getCurrentTime();
+       }
+      }                                   
+   }
+  }
+  if((brightness <= 0) && dimState){
+    Serial.printf("Setting Dimsum to false\n");
+    dimState = false;
+    delay(60000);
+   }
+}
 void displayText(){ //display things on screen
   Serial.printf("texts should be displaying");
   display.clearDisplay();  //display.clearDisplay();
@@ -155,8 +218,6 @@ void displayText(){ //display things on screen
   display.setCursor(0,0);
   display.setTextColor(SSD1306_WHITE);//display.setTextSize(1); 
 }
-void turnOnWemos();
-void turnOffWemos();
 void printIP() {
   Serial.printf("My IP address: ");
   for (byte thisByte = 0; thisByte < 3; thisByte++) {
@@ -164,29 +225,7 @@ void printIP() {
  }
  Serial.printf("%i\n",Ethernet.localIP()[3]);
 }
-int getCurrentTime(){ //try to write to get it on at anytime I pass into the function
-  int currentTime;
-  int hours = hour();
-  int minutes = minute();
-  int seconds = second();  //might be extraneous?
-  currentTime = hours + minutes + seconds;
-  Serial.printf("Time: %i : %i, : %i \n", hours, minutes, seconds);  // have it display to screen eventually?
-    return currentTime;
- }
-  int setSpecifiedTime(int hours, int minutes, int seconds){  //I am quite unsure what I am doing here
-  int certainTime = hours + minutes + seconds;
-  return certainTime;
-}
-bool DoTimesMatch(int time1, int time2){
-  bool timesMatch;
-  if (time1 == time2){  //this is most certainly wrong
-    timesMatch = true;
-  }
- else{
-   timesMatch = false;
-  }
- return timesMatch;
-}time_t getTeensy3Time() {
+time_t getTeensy3Time() {
   return Teensy3Clock.get();
 }
 /*  code to process time sync messages from the serial port   */
